@@ -10,6 +10,12 @@
     font-size: 3em;
     font-weight: bold;
 
+    @media (max-width: 768px) {
+        width: 50px;
+        height: 50px;
+        font-size: 2em;
+    }
+
     &.Two {
         background-color: #EEE4DA;
         color: #776E65
@@ -60,7 +66,7 @@
         color: #F9F6F2
     }
 
-    &.TwoThousandFortyEight, &.FourThousandNinetySix, &.EightThousandOneHundredNinetyTwo, &.SixteenThousandTreeHundredEightyFour {
+    &.TwoThousandFortyEight {
         background-color: #EDC22E;
         color: #F9F6F2
     }

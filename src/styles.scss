@@ -2,6 +2,7 @@
 body {
     background-color: #FAF9EE;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    overscroll-behavior-y: contain;
 }
 
 button {

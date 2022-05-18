@@ -1,7 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { filter, from, fromEvent, Observable, Subject, Subscription } from 'rxjs';
+import { filter, from, fromEvent, map, merge, Observable, Subject, Subscription, throttleTime } from 'rxjs';
 import { BlockType } from 'src/enums/BlockType.enum';
 import { Key } from 'src/enums/Key.enum';
+import * as Hammer from 'hammerjs';
 
 @Component({
   selector: 'app-grid',
@@ -11,6 +12,7 @@ import { Key } from 'src/enums/Key.enum';
 export class GridComponent implements OnInit {
 
   keyPress$!: Subscription;
+  swipe$ = new Subject<Key>();
   grid: BlockType[][] = [
     [BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty],
     [BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty],
@@ -45,16 +47,33 @@ export class GridComponent implements OnInit {
   }
 
   listenForArrowKeys() {
-    this.keyPress$ = fromEvent<KeyboardEvent>(document, 'keyup').pipe(
-      filter((event: KeyboardEvent) => {
-        return event.key === Key.ArrowUp ||
-          event.key === Key.ArrowDown ||
-          event.key === Key.ArrowLeft ||
-          event.key === Key.ArrowRight;
-      })
-    ).subscribe((event: KeyboardEvent) => {
-      event.preventDefault();
-      this.moveBlocks(event.key as Key);
+    const hammerTap = new Hammer.Manager(document.body, {
+      recognizers: [
+        [Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }],
+      ]
+    })
+
+    hammerTap.on('swipeleft', (event) => this.swipe$.next(Key.ArrowLeft));
+    hammerTap.on('swiperight', (event) => this.swipe$.next(Key.ArrowRight));
+    hammerTap.on('swipeup', (event) => this.swipe$.next(Key.ArrowUp));
+    hammerTap.on('swipedown', (event) => this.swipe$.next(Key.ArrowDown));
+
+    this.keyPress$ = merge(
+      fromEvent<KeyboardEvent>(document, 'keyup').pipe(
+        filter((event: KeyboardEvent) => {
+          return event.key === Key.ArrowUp ||
+            event.key === Key.ArrowDown ||
+            event.key === Key.ArrowLeft ||
+            event.key === Key.ArrowRight;
+        }),
+        map((event: KeyboardEvent) => {
+          event.preventDefault();
+          return event.key
+        })
+        ),
+      this.swipe$.pipe(throttleTime(200))
+    ).subscribe((event: string) => {
+      this.moveBlocks(event as Key);
     });
   }
 
