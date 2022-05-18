@@ -1,5 +1,7 @@
 # 2048
 
+A 2048 Game made with Angular 13.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.5.
 
 ## Development server

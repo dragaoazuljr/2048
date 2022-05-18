@@ -1,0 +1,67 @@
+.block {
+    width: 80px;
+    height: 80px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #CDC1B4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    font-weight: bold;
+
+    &.Two {
+        background-color: #EEE4DA;
+        color: #776E65
+    }
+
+    &.Four {
+        background-color: #EDE0C8;
+        color: #776E65
+    }
+
+    &.Eight {
+        background-color: #F2B179;
+        color: #F9F6F2
+    }
+
+    &.Sixteen {
+        background-color: #F59563;
+        color: #F9F6F2
+    }
+
+    &.ThirtyTwo {
+        background-color: #F67C5F;
+        color: #F9F6F2
+    }
+
+    &.SixtyFour {
+        background-color: #F65E3B;
+        color: #F9F6F2
+    }
+
+    &.OneHundredTwentyEight {
+        background-color: #EDCF72;
+        color: #F9F6F2
+    }
+
+    &.TwoFiftySix {
+        background-color: #EDCC61;
+        color: #F9F6F2
+    }
+
+    &.FiveTwelve {
+        background-color: #EDC850;
+        color: #F9F6F2
+    }
+
+    &.OneHundredTwentyFour {
+        background-color: #EDC53F;
+        color: #F9F6F2
+    }
+
+    &.TwoHundredFiftySix {
+        background-color: #EDC22E;
+        color: #F9F6F2
+    }
+}

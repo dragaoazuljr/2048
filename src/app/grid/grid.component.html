@@ -1,0 +1,9 @@
+<div class="main">
+    <div class="grid">
+        <div class="lines" *ngFor="let line of grid; let i = index">
+            <div class="column" *ngFor="let cell of line; let j = index">
+                <app-block [blockType]="grid[i][j]"></app-block>
+            </div>
+        </div>
+    </div>
+</div>
