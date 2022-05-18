@@ -37,7 +37,10 @@ export class GridComponent implements OnInit {
       this.clearGrid();
       this.addBlock(BlockType.Two);
       this.addBlock(BlockType.Two);
+    } else {
+      this.checkGameOver();
     }
+    this.calculateScore()
     this.listenForArrowKeys();
   }
 
@@ -52,26 +55,28 @@ export class GridComponent implements OnInit {
     ).subscribe((event: KeyboardEvent) => {
       event.preventDefault();
       this.moveBlocks(event.key as Key);
-      this.addBlock()
     });
   }
 
   moveBlocks(key: Key) {
+    let hasMoved = false;
+
     switch (key) {
       case Key.ArrowUp:
-        this.moveBlocksUp();
+        hasMoved = this.moveBlocksUp();
         break;
       case Key.ArrowDown:
-        this.moveBlocksDown();
+        hasMoved = this.moveBlocksDown();
         break;
       case Key.ArrowLeft:
-        this.moveBlocksLeft();
+        hasMoved = this.moveBlocksLeft();
         break;
       case Key.ArrowRight:
-        this.moveBlocksRight();
+        hasMoved = this.moveBlocksRight();
         break;
     }
 
+    hasMoved ? this.addBlock() : false;
     this.checkGameOver();
   }
 
@@ -90,12 +95,61 @@ export class GridComponent implements OnInit {
     const emptyBlocks = this.getEmptyBlocks();
 
     if (emptyBlocks.length === 0) {
-      this.keyPress$.unsubscribe();
-      const playAgain = confirm('Game Over! Play again?');
+      let hasMergebleBlocks = false;
+      
+      for (let line = 0; line < 4; line++) {
+        let mergebleSideBlocks = []; 
+        let mergebleUpBlocks = [];
+        
+        this.grid[line].forEach((block, i, blocks) => {
+          if(i === 0) {
+            block === blocks[i + 1] ? mergebleSideBlocks.push(block) : false;
+          } else if(i === 3) {
+            block === blocks[i - 1] ? mergebleSideBlocks.push(block) : false;
+          } else {
+            block === blocks[i - 1] || block === blocks[i + 1] ? mergebleSideBlocks.push(block) : false;
+          }
 
-      if (playAgain) {
-        this.startGame();
+
+          if(line === 0) {
+            block === this.grid[line + 1][i] ? mergebleUpBlocks.push(block) : false;
+          } else if(line === 3) {
+            block === this.grid[line - 1][i] ? mergebleUpBlocks.push(block) : false;
+          } else {
+            block === this.grid[line + 1][i] || block === this.grid[line - 1][i] ? mergebleUpBlocks.push(block) : false;
+          }
+        });
+
+        if (mergebleSideBlocks.length || mergebleUpBlocks.length) {
+          hasMergebleBlocks = true;
+          break;
+        }
       }
+
+      if (!hasMergebleBlocks) {
+       this.endGame(false);
+      }
+    }
+
+    const hasTwoThousandFortyEightBlock = this.getBlocksPositionsAndValue().some((block) => {
+      return block.value === BlockType.TwoThousandFortyEight
+    });
+
+    if (hasTwoThousandFortyEightBlock) {
+      this.endGame(true);
+    }
+  }
+
+  endGame(win: boolean) {
+    const playAgain = confirm( win ? 'Congratulations, you won! Wanna continue?' : 'Game Over! Play again?');
+    
+    if (playAgain && !win) {
+      this.keyPress$?.unsubscribe();
+      this.startGame();
+    }
+    
+    if (!playAgain && !win) {
+      this.keyPress$?.unsubscribe();
     }
   }
 
@@ -112,8 +166,9 @@ export class GridComponent implements OnInit {
     return emptyBlocks;
   }
   
-  moveBlocksUp() {
+  moveBlocksUp(): boolean {
     const blocksPositions = this.getBlocksPositionsAndValue();
+    let hasMoved = false;
 
     blocksPositions.forEach((block) => {
       if (block.line > 0) {
@@ -124,20 +179,25 @@ export class GridComponent implements OnInit {
              this.grid[linesAbove - 1][block.column] = block.value;
              this.grid[linesAbove][block.column] = BlockType.Empty;
              linesAbove--;
+             hasMoved = true;
            } else if (this.grid[linesAbove - 1][block.column] === block.value) {
              this.grid[linesAbove - 1][block.column] = block.value * 2;
              this.grid[linesAbove][block.column] = BlockType.Empty;
              linesAbove--;
+              hasMoved = true;
            }else {
              break;
            }
         }
       }
     });
+
+    return hasMoved;
   }
   
   moveBlocksDown() {
-    const blocksPositions = this.getBlocksPositionsAndValue();
+    const blocksPositions = this.getBlocksPositionsAndValue().reverse();
+    let hasMoved = false;
 
     blocksPositions.forEach((block) => {
       if (block.line < 3) {
@@ -148,20 +208,25 @@ export class GridComponent implements OnInit {
             this.grid[linesBelow + 1][block.column] = block.value;
             this.grid[linesBelow][block.column] = BlockType.Empty;
             linesBelow++;
+            hasMoved = true;
           } else if (this.grid[linesBelow + 1][block.column] === block.value) {
             this.grid[linesBelow + 1][block.column] = block.value * 2;
             this.grid[linesBelow][block.column] = BlockType.Empty;
             linesBelow++;
+            hasMoved = true;
           } else {
             break;
           }
         }
       }
     });
+
+    return hasMoved;
   }
 
   moveBlocksLeft() {
     const blocksPositions = this.getBlocksPositionsAndValue();
+    let hasMoved = false;
 
     blocksPositions.forEach((block) => {
       if (block.column > 0) {
@@ -172,20 +237,26 @@ export class GridComponent implements OnInit {
             this.grid[block.line][columnsLeft - 1] = block.value;
             this.grid[block.line][columnsLeft] = BlockType.Empty;
             columnsLeft--;
+            hasMoved = true;
           } else if (this.grid[block.line][columnsLeft - 1] === block.value) {
             this.grid[block.line][columnsLeft - 1] = block.value * 2;
             this.grid[block.line][columnsLeft] = BlockType.Empty;
             columnsLeft--;
+            hasMoved = true;
           } else {
             break;
           }
         }
+
       }
     });
+
+    return hasMoved;
   }
   
   moveBlocksRight() {
-    const blocksPositions = this.getBlocksPositionsAndValue();
+    const blocksPositions = this.getBlocksPositionsAndValue().reverse();
+    let hasMoved = false;
 
     blocksPositions.forEach((block) => {
       if (block.column < 3) {
@@ -196,16 +267,20 @@ export class GridComponent implements OnInit {
             this.grid[block.line][columnsRight + 1] = block.value;
             this.grid[block.line][columnsRight] = BlockType.Empty;
             columnsRight++;
+            hasMoved = true;
           } else if (this.grid[block.line][columnsRight + 1] === block.value) {
             this.grid[block.line][columnsRight + 1] = block.value * 2;
             this.grid[block.line][columnsRight] = BlockType.Empty;
             columnsRight++;
+            hasMoved = true;
           } else {
             break;
           }
         }
       }
     });
+
+    return hasMoved;
   }
   
   getBlocksPositionsAndValue() {

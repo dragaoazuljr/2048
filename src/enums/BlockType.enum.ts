@@ -9,6 +9,9 @@ export enum BlockType {
     OneHundredTwentyEight = 128,
     TwoHundredFiftySix = 256,
     FiveHundredTwelve = 512,
-    OneThousandTwoHundredFortyEight = 1024,
-    TwoThousandFiveHundredEightyFour = 2048,
+    OneThousandTwentyFour = 1024,
+    TwoThousandFortyEight = 2048,
+    FourThousandNinetySix = 4096,
+    EightThousandOneHundredNinetyTwo = 8192,
+    SixteenThousandTreeHundredEightyFour = 16384,
 }
