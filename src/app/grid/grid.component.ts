@@ -351,14 +351,12 @@ export class GridComponent implements OnInit {
   getRandomBlockType(): BlockType {
     const randomNumber = Math.floor(Math.random() * 10);
 
-    if (randomNumber < 2) {
+    if (randomNumber < 3) {
       return BlockType.Two;
-    } else if (randomNumber < 4) {
-      return BlockType.Four;
     } else if (randomNumber < 6) {
-      return BlockType.Eight;
+      return BlockType.Four;
     } else {
-      return BlockType.Sixteen;
+      return BlockType.Eight;
     } 
   }
 
